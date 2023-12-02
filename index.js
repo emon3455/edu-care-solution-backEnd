@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 5000;
@@ -40,6 +40,13 @@ async function run() {
             res.send(result)
         })
 
+        app.get("/classes/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await classesCollection.findOne(query);
+            res.send(result)
+        })
+
 
         // sessions:
         app.get("/sessions", async(req, res)=>{
@@ -48,6 +55,13 @@ async function run() {
                 query = {email: req.query.email}
             }
             const result = await sessionsCollection.find(query).toArray();
+            res.send(result)
+        })
+
+        app.get("/sessions/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await sessionsCollection.findOne(query);
             res.send(result)
         })
 
@@ -62,6 +76,13 @@ async function run() {
             res.send(result)
         })
 
+        app.get("/blogs/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await blogsCollection.findOne(query);
+            res.send(result)
+        })
+
 
         // users:
         app.get("/users", async(req, res)=>{
@@ -73,6 +94,12 @@ async function run() {
             res.send(result)
         })
 
+        app.get("/users/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await usersCollection.findOne(query);
+            res.send(result)
+        })
 
 
         await client.db("admin").command({ ping: 1 });
