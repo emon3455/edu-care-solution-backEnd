@@ -47,6 +47,13 @@ async function run() {
             res.send(result)
         })
 
+        app.delete("/classes/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await classesCollection.deleteOne(query);
+            res.send(result)
+        })
+
 
         // sessions:
         app.get("/sessions", async(req, res)=>{
@@ -62,6 +69,13 @@ async function run() {
             const id = req?.params?.id;
             const query = {_id : new ObjectId(id)}
             const result = await sessionsCollection.findOne(query);
+            res.send(result)
+        })
+
+        app.delete("/sessions/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await sessionsCollection.deleteOne(query);
             res.send(result)
         })
 
@@ -83,6 +97,12 @@ async function run() {
             res.send(result)
         })
 
+        app.delete("/blogs/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await blogsCollection.deleteOne(query);
+            res.send(result)
+        })
 
         // users:
         app.get("/users", async(req, res)=>{
@@ -98,6 +118,13 @@ async function run() {
             const id = req?.params?.id;
             const query = {_id : new ObjectId(id)}
             const result = await usersCollection.findOne(query);
+            res.send(result)
+        })
+
+        app.delete("/users/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await usersCollection.deleteOne(query);
             res.send(result)
         })
 
