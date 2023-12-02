@@ -30,7 +30,7 @@ async function run() {
         const sessionsCollection = client.db("eduCareSolutions").collection("sessions");
         const usersCollection = client.db("eduCareSolutions").collection("users");
 
-        // classes:
+        // -----------classes---------------:
         app.get("/classes", async(req, res)=>{
             const query={}
             if(req.query.email){
@@ -47,6 +47,12 @@ async function run() {
             res.send(result)
         })
 
+        app.post("/classes", async(req, res)=>{
+            const classes = req.body;
+            const result = await classesCollection.insertOne(classes);
+            res.send(result)
+        })
+
         app.delete("/classes/:id", async(req, res)=>{
             const id = req?.params?.id;
             const query = {_id : new ObjectId(id)}
@@ -55,7 +61,7 @@ async function run() {
         })
 
 
-        // sessions:
+        // ------------------sessions-------------------:
         app.get("/sessions", async(req, res)=>{
             const query={}
             if(req.query.email){
@@ -72,6 +78,12 @@ async function run() {
             res.send(result)
         })
 
+        app.post("/sessions", async(req, res)=>{
+            const sessions = req.body;
+            const result = await sessionsCollection.insertOne(sessions);
+            res.send(result)
+        })
+
         app.delete("/sessions/:id", async(req, res)=>{
             const id = req?.params?.id;
             const query = {_id : new ObjectId(id)}
@@ -80,7 +92,7 @@ async function run() {
         })
 
 
-        // blogs:
+        // ------------------blogs---------------------:
         app.get("/blogs", async(req, res)=>{
             const query={}
             if(req.query.email){
@@ -97,6 +109,12 @@ async function run() {
             res.send(result)
         })
 
+        app.post("/blogs", async(req, res)=>{
+            const blogs = req.body;
+            const result = await blogsCollection.insertOne(blogs);
+            res.send(result)
+        })
+
         app.delete("/blogs/:id", async(req, res)=>{
             const id = req?.params?.id;
             const query = {_id : new ObjectId(id)}
@@ -104,7 +122,7 @@ async function run() {
             res.send(result)
         })
 
-        // users:
+        // ------------------users------------------:
         app.get("/users", async(req, res)=>{
             const query={}
             if(req.query.email){
@@ -118,6 +136,12 @@ async function run() {
             const id = req?.params?.id;
             const query = {_id : new ObjectId(id)}
             const result = await usersCollection.findOne(query);
+            res.send(result)
+        })
+
+        app.post("/users", async(req, res)=>{
+            const users = req.body;
+            const result = await usersCollection.insertOne(users);
             res.send(result)
         })
 
