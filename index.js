@@ -131,6 +131,24 @@ async function run() {
             res.send(result)
         })
 
+        app.patch("/sessions/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const session = req.body;
+            const updatedDoc = {
+                $set:{
+                    title: session.title,
+                    sessionBanner: session.sessionBanner,
+                    sessionDate: session.sessionDate,
+                    sessionPlatform: session.sessionPlatform,
+                    sessionLink: session.sessionLink,
+                    sessionTime: session.sessionTime,
+                }
+            }
+            const result = await categoryCollection.updateOne(query,updatedDoc);
+            res.send(result)
+        })
+
 
         // ------------------blogs---------------------:
         app.get("/blogs", async(req, res)=>{
