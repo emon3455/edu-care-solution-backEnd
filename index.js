@@ -25,10 +25,50 @@ async function run() {
         await client.connect();
 
         // collections:
+        const categoryCollection = client.db("eduCareSolutions").collection("categorys");
         const classesCollection = client.db("eduCareSolutions").collection("classes");
         const blogsCollection = client.db("eduCareSolutions").collection("blogs");
         const sessionsCollection = client.db("eduCareSolutions").collection("sessions");
         const usersCollection = client.db("eduCareSolutions").collection("users");
+
+        // -----------category--------------:
+        app.get("/categorys", async(req, res)=>{
+            const result = await categoryCollection.find().toArray();
+            res.send(result)
+        })
+
+        app.get("/categorys/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await categoryCollection.findOne(query);
+            res.send(result)
+        })
+
+        app.post("/categorys", async(req, res)=>{
+            const category = req.body;
+            const result = await categoryCollection.insertOne(category);
+            res.send(result)
+        })
+
+        app.patch("/categorys/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const category = req.body;
+            const updatedDoc = {
+                $set:{
+                    categoryName: category.categoryName
+                }
+            }
+            const result = await categoryCollection.updateOne(query,updatedDoc);
+            res.send(result)
+        })
+
+        app.delete("/categorys/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await categoryCollection.deleteOne(query);
+            res.send(result)
+        })
 
         // -----------classes---------------:
         app.get("/classes", async(req, res)=>{
