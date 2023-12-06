@@ -145,7 +145,7 @@ async function run() {
                     sessionTime: session.sessionTime,
                 }
             }
-            const result = await categoryCollection.updateOne(query,updatedDoc);
+            const result = await sessionsCollection.updateOne(query, updatedDoc);
             res.send(result)
         })
 
@@ -180,6 +180,37 @@ async function run() {
             res.send(result)
         })
 
+        app.patch("/blogs/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const blog = req.body;
+            const updatedDoc = {
+                $set:{
+                    title: blog.title,
+                    blogBanner: blog.blogBanner,
+                    description: blog.description,
+                }
+            }
+            const result = await blogsCollection.updateOne(query,updatedDoc);
+            res.send(result)
+        })
+
+        app.patch("/blogsLike/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const filter = {_id : new ObjectId(id)}
+            let like;
+            if(req.query.NoOfLike){
+                like = {NoOfLike: req.query.NoOfLike}
+            }
+            const updatedDoc = {
+                $set:{
+                    NoOfLike: like,
+                }
+            }
+            const result = await blogsCollection.updateOne(filter, updatedDoc);
+            res.send(result)
+        })
+
         // ------------------users------------------:
         app.get("/users", async(req, res)=>{
             const query={}
@@ -207,6 +238,29 @@ async function run() {
             const id = req?.params?.id;
             const query = {_id : new ObjectId(id)}
             const result = await usersCollection.deleteOne(query);
+            res.send(result)
+        })
+
+        app.patch("/users/:id", async(req, res)=>{
+            const id = req?.params?.id;
+            const query = {_id : new ObjectId(id)}
+            const user = req.body;
+            const updatedDoc = {
+                $set:{
+                    name: user.name,
+                    speciality: user.speciality,
+                    phone: user.phone,
+                    imageURL: user.imageURL,
+                    gender: user.gender,
+                    age: user.age,
+                    nationality: user.nationality,
+                    interests: user.interests,
+                    skills: user.skills,
+                    education: user.education,
+                    address: user.address,
+                }
+            }
+            const result = await sessionsCollection.updateOne(query, updatedDoc);
             res.send(result)
         })
 
