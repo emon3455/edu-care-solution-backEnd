@@ -130,6 +130,24 @@ async function run() {
             res.send(result)
         })
 
+        app.patch("/classes/:id", async (req, res) => {
+            const id = req?.params?.id;
+            const query = { _id: new ObjectId(id) }
+            const classes = req.body;
+            const updatedDoc = {
+                $set: {
+                    title: classes.title,
+                    bannerURL: classes.bannerURL,
+                    videoURL: classes.videoURL,
+                    description: classes.description,
+                    categoryId: classes.categoryId,
+                    categoryName: classes.categoryName,
+                }
+            }
+            const result = await classesCollection.updateOne(query, updatedDoc);
+            res.send(result)
+        })
+
 
         // ------------------sessions-------------------:
         app.get("/sessions", async (req, res) => {
