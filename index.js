@@ -62,11 +62,14 @@ async function run() {
 
 
         // -----------category--------------:
+
+        // to get all categorys
         app.get("/categorys", async (req, res) => {
             const result = await categoryCollection.find().toArray();
             res.send(result)
         })
 
+        // get category by id
         app.get("/categorys/:id", async (req, res) => {
             const id = req?.params?.id;
             const query = { _id: new ObjectId(id) }
@@ -74,12 +77,14 @@ async function run() {
             res.send(result)
         })
 
+        // add category
         app.post("/categorys", async (req, res) => {
             const category = req.body;
             const result = await categoryCollection.insertOne(category);
             res.send(result)
         })
 
+        // update category
         app.patch("/categorys/:id", async (req, res) => {
             const id = req?.params?.id;
             const query = { _id: new ObjectId(id) }
@@ -93,6 +98,7 @@ async function run() {
             res.send(result)
         })
 
+        // delete category
         app.delete("/categorys/:id", async (req, res) => {
             const id = req?.params?.id;
             const query = { _id: new ObjectId(id) }
@@ -101,15 +107,24 @@ async function run() {
         })
 
         // -----------classes---------------:
+
+        // gte all courses
         app.get("/classes", async (req, res) => {
-            const query = {}
-            if (req.query.email) {
-                query = { email: req.query.email }
+            const result = await classesCollection.find().toArray();
+            res.send(result)
+        })
+
+        // get my courses
+        app.get("/classes/myClass", async (req, res) => {
+            const query = {};
+            if (req.query.teacherEmail) {
+                query.teacherEmail = req.query.teacherEmail;
             }
             const result = await classesCollection.find(query).toArray();
             res.send(result)
         })
 
+        // get courses by id
         app.get("/classes/:id", async (req, res) => {
             const id = req?.params?.id;
             const query = { _id: new ObjectId(id) }
@@ -117,12 +132,14 @@ async function run() {
             res.send(result)
         })
 
+        // add course
         app.post("/classes", async (req, res) => {
             const classes = req.body;
             const result = await classesCollection.insertOne(classes);
             res.send(result)
         })
 
+        // delete course
         app.delete("/classes/:id", async (req, res) => {
             const id = req?.params?.id;
             const query = { _id: new ObjectId(id) }
@@ -130,6 +147,7 @@ async function run() {
             res.send(result)
         })
 
+        // update course
         app.patch("/classes/:id", async (req, res) => {
             const id = req?.params?.id;
             const query = { _id: new ObjectId(id) }
@@ -139,9 +157,10 @@ async function run() {
                     title: classes.title,
                     bannerURL: classes.bannerURL,
                     videoURL: classes.videoURL,
-                    description: classes.description,
                     categoryId: classes.categoryId,
                     categoryName: classes.categoryName,
+                    price: classes.price,
+                    description: classes.description,
                 }
             }
             const result = await classesCollection.updateOne(query, updatedDoc);
@@ -150,15 +169,24 @@ async function run() {
 
 
         // ------------------sessions-------------------:
+
+        //to get all session
         app.get("/sessions", async (req, res) => {
-            const query = {}
-            if (req.query.email) {
-                query = { email: req.query.email }
+            const result = await sessionsCollection.find().toArray();
+            res.send(result)
+        })
+
+        // to get all my session
+        app.get("/sessions/mySessions", async (req, res) => {
+            const query = {};
+            if (req.query.teacherEmail) {
+                query.teacherEmail = req.query.teacherEmail;
             }
             const result = await sessionsCollection.find(query).toArray();
             res.send(result)
         })
 
+        // get session by id
         app.get("/sessions/:id", async (req, res) => {
             const id = req?.params?.id;
             const query = { _id: new ObjectId(id) }
@@ -166,12 +194,14 @@ async function run() {
             res.send(result)
         })
 
+        // add session
         app.post("/sessions", async (req, res) => {
             const sessions = req.body;
             const result = await sessionsCollection.insertOne(sessions);
             res.send(result)
         })
 
+        // delete sessions
         app.delete("/sessions/:id", async (req, res) => {
             const id = req?.params?.id;
             const query = { _id: new ObjectId(id) }
@@ -179,6 +209,7 @@ async function run() {
             res.send(result)
         })
 
+        // update sessions
         app.patch("/sessions/:id", async (req, res) => {
             const id = req?.params?.id;
             const query = { _id: new ObjectId(id) }
@@ -199,15 +230,22 @@ async function run() {
 
 
         // ------------------blogs---------------------:
+        // to get all blogs
         app.get("/blogs", async (req, res) => {
-            const query = {}
-            if (req.query.email) {
-                query = { email: req.query.email }
+            const result = await blogsCollection.find().toArray();
+            res.send(result)
+        })
+        // to get all my blogs
+        app.get("/blogs/myBlogs", async (req, res) => {
+            const query = {};
+            if (req.query.teacherEmail) {
+                query.teacherEmail = req.query.teacherEmail;
             }
             const result = await blogsCollection.find(query).toArray();
             res.send(result)
         })
 
+        // get blogs by id
         app.get("/blogs/:id", async (req, res) => {
             const id = req?.params?.id;
             const query = { _id: new ObjectId(id) }
@@ -215,12 +253,14 @@ async function run() {
             res.send(result)
         })
 
+        // add blogs
         app.post("/blogs", async (req, res) => {
             const blogs = req.body;
             const result = await blogsCollection.insertOne(blogs);
             res.send(result)
         })
 
+        // delete blogs
         app.delete("/blogs/:id", async (req, res) => {
             const id = req?.params?.id;
             const query = { _id: new ObjectId(id) }
@@ -228,6 +268,7 @@ async function run() {
             res.send(result)
         })
 
+        // blogs update
         app.patch("/blogs/:id", async (req, res) => {
             const id = req?.params?.id;
             const query = { _id: new ObjectId(id) }
@@ -243,21 +284,49 @@ async function run() {
             res.send(result)
         })
 
+        // add like
         app.patch("/blogsLike/:id", async (req, res) => {
             const id = req?.params?.id;
-            const filter = { _id: new ObjectId(id) }
+            const filter = { _id: new ObjectId(id) };
             let like;
             if (req.query.NoOfLike) {
-                like = { NoOfLike: req.query.NoOfLike }
+                like = req.query.NoOfLike;
             }
+
+            // Extract email from the query parameters
+            const likedUserEmail = req.query.email;
+
+            if (!likedUserEmail) {
+                return res.status(400).send("Email is required for liking.");
+            }
+
+            const existingBlog = await blogsCollection.findOne(filter);
+
+            // Check if the user has already liked
+            if (existingBlog.likedUsers && existingBlog.likedUsers.includes(likedUserEmail)) {
+                return res.status(400).send("User has already liked this blog.");
+            }
+
+            // Update the likedUsers array
             const updatedDoc = {
                 $set: {
                     NoOfLike: like,
-                }
+                },
+                $push: {
+                    likedUsers: likedUserEmail,
+                },
+            };
+
+            try {
+                const result = await blogsCollection.updateOne(filter, updatedDoc);
+                res.send(result);
+            } catch (error) {
+                // Handle errors, e.g., invalid ObjectId or database connection issues
+                console.error(error);
+                res.status(500).send("Internal Server Error");
             }
-            const result = await blogsCollection.updateOne(filter, updatedDoc);
-            res.send(result)
-        })
+        });
+
 
         // ------------------users------------------:
         app.get("/users", async (req, res) => {
