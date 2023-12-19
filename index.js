@@ -221,6 +221,8 @@ async function run() {
                     sessionPlatform: session.sessionPlatform,
                     sessionLink: session.sessionLink,
                     sessionTime: session.sessionTime,
+                    teacherName: session.teacherName,
+                    teacherEmail: session.teacherEmail,
                 }
             }
             const result = await sessionsCollection.updateOne(query, updatedDoc);
@@ -283,67 +285,6 @@ async function run() {
             res.send(result)
         })
 
-        // add like
-        // app.patch("/blogsLike/:id", async (req, res) => {
-        //     const id = req?.params?.id;
-        //     const filter = { _id: new ObjectId(id) };
-        //     let like;
-        //     if (req.query.NoOfLike) {
-        //         like = parseInt(req.query.NoOfLike);
-        //     }
-
-        //     // Extract email from the query parameters
-        //     const likedUserEmail = req.query.email;
-
-        //     if (!likedUserEmail) {
-        //         return res.status(400).send("Email is required for liking.");
-        //     }
-
-        //     const existingBlog = await blogsCollection.findOne(filter);
-
-        //     // Check if the user has already liked
-        //     const userAlreadyLiked = existingBlog.likedUsers && existingBlog.likedUsers.includes(likedUserEmail);
-
-        //     if (userAlreadyLiked) {
-        //         // User has already liked, so remove the like
-        //         const updatedDoc = {
-        //             $set: {
-        //                 NoOfLike: like,
-        //             },
-        //             $pull: {
-        //                 likedUsers: likedUserEmail,
-        //             },
-        //         };
-
-        //         try {
-        //             const result = await blogsCollection.updateOne(filter, updatedDoc);
-        //             res.send(result);
-        //         } catch (error) {
-        //             // Handle errors, e.g., invalid ObjectId or database connection issues
-        //             console.error(error);
-        //             res.status(500).send("Internal Server Error");
-        //         }
-        //     } else {
-        //         // User has not liked, so add the like
-        //         const updatedDoc = {
-        //             $set: {
-        //                 NoOfLike: like,
-        //             },
-        //             $push: {
-        //                 likedUsers: likedUserEmail,
-        //             },
-        //         };
-
-        //         try {
-        //             const result = await blogsCollection.updateOne(filter, updatedDoc);
-        //             res.send(result);
-        //         } catch (error) {
-        //             // Handle errors, e.g., invalid ObjectId or database connection issues
-        //             console.error(error);
-        //             res.status(500).send("Internal Server Error");
-        //         }
-        //     }
-        // });
         app.patch("/blogsLike/:id", async (req, res) => {
             const id = req?.params?.id;
             const filter = { _id: new ObjectId(id) };
@@ -467,19 +408,52 @@ async function run() {
             const updatedDoc = {
                 $set: {
                     name: user.name,
-                    speciality: user.speciality,
-                    phone: user.phone,
-                    imageURL: user.imageURL,
+                    number: user.number,
+                    image: user.imageURL,
                     gender: user.gender,
-                    age: user.age,
-                    nationality: user.nationality,
-                    interests: user.interests,
+                    dateOfBirth: user.dateOfBirth,
+                    interest: user.interest,
                     skills: user.skills,
-                    education: user.education,
+                    educationalQualifications: user.educationalQualifications,
                     address: user.address,
                 }
             }
-            const result = await sessionsCollection.updateOne(query, updatedDoc);
+            const result = await usersCollection.updateOne(query, updatedDoc);
+            res.send(result)
+        })
+
+        app.patch("/usersRole/:id", async (req, res) => {
+            const id = req?.params?.id;
+            const query = { _id: new ObjectId(id) }
+            const user = req?.body;
+            const updatedDoc = {
+                $set: {
+                    roles: user.roles,
+                }
+            }
+            const result = await usersCollection.updateOne(query, updatedDoc);
+            res.send(result)
+        })
+
+        // ---------stats---------------
+        app.get("/stats", async (req, res) => {
+
+            const classes = await classesCollection.find().toArray();
+            const sessions = await sessionsCollection.find().toArray();
+            const blogs = await blogsCollection.find().toArray();
+            const users = await usersCollection.find().toArray();
+            const teacher = users.filter(user => user?.roles === "Teacher")
+            const student = users.filter(user => user?.roles === "Student")
+
+            const result={
+                noOfCourse: classes.length,
+                noOfSessions: sessions.length,
+                noOfBlogs: blogs.length,
+                noOfUsers: users.length,
+                noOfTeacher: teacher.length,
+                noOfStudent: student.length
+            }
+
             res.send(result)
         })
 
