@@ -409,9 +409,11 @@ async function run() {
                 $set: {
                     name: user.name,
                     number: user.number,
-                    image: user.imageURL,
+                    email:user.email,
+                    image: user.image,
                     gender: user.gender,
                     dateOfBirth: user.dateOfBirth,
+                    nid: user.nid,
                     interest: user.interest,
                     skills: user.skills,
                     educationalQualifications: user.educationalQualifications,
