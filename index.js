@@ -409,7 +409,7 @@ async function run() {
                 $set: {
                     name: user.name,
                     number: user.number,
-                    email:user.email,
+                    email: user.email,
                     image: user.image,
                     gender: user.gender,
                     dateOfBirth: user.dateOfBirth,
@@ -437,6 +437,29 @@ async function run() {
             res.send(result)
         })
 
+        // -----------suggested course-----------
+        app.get('/getSuggestedCourses/:email', async (req, res) => {
+            try {
+                const email = req.params.email;
+
+                // Step 1: Get User's Interests
+                const user = await usersCollection.findOne({ email: email });
+
+                const userInterests = user.interest;
+
+                // Step 2: Find Matching Courses
+                const suggestedCourses = await classesCollection.find({ categoryName: { $in: userInterests } }).toArray();
+
+                const sortedSuggestedCourses = suggestedCourses.sort((a, b) => b.rating - a.rating);
+                res.json(sortedSuggestedCourses);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        });
+
+
         // ---------stats---------------
         app.get("/stats", async (req, res) => {
 
@@ -447,7 +470,7 @@ async function run() {
             const teacher = users.filter(user => user?.roles === "Teacher")
             const student = users.filter(user => user?.roles === "Student")
 
-            const result={
+            const result = {
                 noOfCourse: classes.length,
                 noOfSessions: sessions.length,
                 noOfBlogs: blogs.length,
@@ -458,6 +481,9 @@ async function run() {
 
             res.send(result)
         })
+
+        // --------------payment-------------
+
 
 
         // await client.db("admin").command({ ping: 1 });
