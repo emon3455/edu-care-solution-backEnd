@@ -1,14 +1,3 @@
 ------classes-----:
 1. update rating,
 2. enroll classes,
-3. attributes need to be changed
-
------sessions-----:
-1. update sessions
-
------blogs--------:
-1. upadte blogs
-2. like/dislike
-
------users--------:
-1. update users
