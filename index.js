@@ -5,28 +5,54 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 5000;
+const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 
 
 // middle ware:
 app.use(cors());
 app.use(express.json());
 
+// const verifyJWT = (req, res, next) => {
+//     const authorization = req.headers.authorization;
+//     if (!authorization) {
+//         return res.status(401).send({ error: true, message: "unAuthorized User" });
+//     }
+//     const token = authorization.split(" ")[1];
+
+//     // verifying:
+//     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
+//         if (error) {
+//             return res.status(403).send({ error: true, message: "unAuthorized User" });
+//         }
+//         req.decoded = decoded;
+//         next();
+//     })
+// }
+
 const verifyJWT = (req, res, next) => {
     const authorization = req.headers.authorization;
+
     if (!authorization) {
-        return res.status(401).send({ error: true, message: "unAuthorized User" });
+        return res.status(401).send({ error: true, message: "Unauthorized User" });
     }
+
     const token = authorization.split(" ")[1];
 
-    // verifying:
+    console.log('Received token:', token); // Log the received token
+
+    // Verifying:
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
         if (error) {
-            return res.status(403).send({ error: true, message: "unAuthorized User" });
+            console.error('Token verification error:', error); // Log verification error
+            return res.status(403).send({ error: true, message: "Unauthorized User" });
         }
+
+        console.log('Decoded email:', decoded?.email); // Log decoded email
+
         req.decoded = decoded;
         next();
-    })
-}
+    });
+};
 
 
 
@@ -49,7 +75,7 @@ async function run() {
         const blogsCollection = client.db("eduCareSolutions").collection("blogs");
         const sessionsCollection = client.db("eduCareSolutions").collection("sessions");
         const usersCollection = client.db("eduCareSolutions").collection("users");
-
+        const paymentsCollections = client.db("eduCareSolutions").collection("payments");
 
         // -----authentication-------
         app.post("/jwt", (req, res) => {
@@ -322,8 +348,6 @@ async function run() {
                         const result = await blogsCollection.updateOne(filter, updatedDoc);
                         res.send(result);
                     } catch (error) {
-                        // Handle errors, e.g., invalid ObjectId or database connection issues
-                        console.error(error);
                         res.status(500).send("Internal Server Error");
                     }
                 } else {
@@ -351,14 +375,10 @@ async function run() {
                         const result = await blogsCollection.updateOne(filter, updatedDoc);
                         res.send(result);
                     } catch (error) {
-                        // Handle errors, e.g., invalid ObjectId or database connection issues
-                        console.error(error);
                         res.status(500).send("Internal Server Error");
                     }
                 }
             } catch (error) {
-                // Handle errors, e.g., invalid ObjectId or database connection issues
-                console.error(error);
                 res.status(500).send("Internal Server Error");
             }
         });
@@ -452,9 +472,8 @@ async function run() {
 
                 const sortedSuggestedCourses = suggestedCourses.sort((a, b) => b.rating - a.rating);
                 res.json(sortedSuggestedCourses);
-                
+
             } catch (error) {
-                console.error('Error:', error);
                 res.status(500).json({ error: 'Internal Server Error' });
             }
         });
@@ -484,6 +503,59 @@ async function run() {
 
         // --------------payment-------------
 
+        // creating payment intent
+        app.post('/create-payment-intent', async (req, res) => {
+            const { price } = req.body;
+            const amount = parseInt(price * 100);
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: amount,
+                currency: 'usd',
+                payment_method_types: ['card']
+            });
+
+            res.send({
+                clientSecret: paymentIntent.client_secret
+            })
+        })
+
+        // payment api:
+        app.post("/payments", async (req, res) => {
+
+            const payment = req.body;
+            const insertedResult = await paymentsCollections.insertOne(payment);
+
+
+            const updateQuery = { _id: new ObjectId(payment.classId) }
+            const paidClass = await classesCollection.findOne(updateQuery);
+            const updatedDoc = {
+                $set: {
+                    totalstu: paidClass.totalstu + 1,
+                },
+            }
+            const updateResult = await classesCollection.updateOne(updateQuery, updatedDoc);
+
+            res.send({ insertedResult, updateResult });
+        })
+
+        // get Enrolled Class:
+        app.get("/enrolledClasses", async (req, res) => {
+
+            const email = req.query.email;
+
+            if (!email) {
+                res.send([]);
+            }
+
+            // const decodedEmail = req?.decoded?.email;
+            // if (email !== decodedEmail) {
+            //     return res.status(403).send({ error: true, message: "forbidden Access" });
+            // }
+
+            const query = { studentEmail: email }
+            const result = await paymentsCollections.find(query).sort({ date: -1 }).toArray();
+            res.send(result);
+
+        })
 
 
         // await client.db("admin").command({ ping: 1 });
